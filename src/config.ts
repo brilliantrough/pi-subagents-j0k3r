@@ -397,8 +397,10 @@ export function subagentSourceWarnings(cwd: string): string[] {
   return warnings;
 }
 
-export function loadSubagents(cwd: string): SubagentDefinition[] {
-  const byName = new Map<string, SubagentDefinition>();
+export function loadSubagents(cwd: string, packageAgents: SubagentDefinition[] = []): SubagentDefinition[] {
+  const byName = new Map<string, SubagentDefinition>(packageAgents.map((agent) => [
+    agent.name, { ...agent, tools: sanitizeTools(agent.tools) },
+  ]));
   for (const source of agentsDirSources(cwd)) {
     const blockedNames = new Set<string>();
     const definitions = loadSubagentsFromDir(source.dir, source.scope, (blocked) => blockedNames.add(blocked.name));

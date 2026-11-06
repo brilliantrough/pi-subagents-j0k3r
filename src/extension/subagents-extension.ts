@@ -1,3 +1,4 @@
+import { installPackageAgentRegistration } from '../package-agents.js';
 import { readSubagentsConfig, subagentSourceWarnings } from '../config.js';
 import { SubagentManager } from '../manager.js';
 import { runSubagentModelsCommand } from '../model-profiles-ui.js';
@@ -20,6 +21,7 @@ function isStaleContextError(error: unknown): boolean {
 }
 
 export default function subagentsExtension(pi: any): void {
+  const packageAgents = installPackageAgentRegistration(pi);
   const originalRegisterTool = typeof pi.registerTool === 'function' ? pi.registerTool.bind(pi) : undefined;
   if (originalRegisterTool) {
     pi.registerTool = (tool: any) => {
@@ -47,6 +49,7 @@ export default function subagentsExtension(pi: any): void {
       }
     },
     (active) => { setWidgetInputSuspended('interaction', active); },
+    packageAgents,
   );
   registerSubagentTools(pi, manager, process.cwd());
 
@@ -194,6 +197,6 @@ export default function subagentsExtension(pi: any): void {
 
   pi.registerCommand?.('subagent-models', {
     description: 'Configure subagent and SDD phase model profiles',
-    handler: async (_args: string, ctx: any) => runSubagentModelsCommand({ ...ctx, pi }),
+    handler: async (_args: string, ctx: any) => runSubagentModelsCommand({ ...ctx, pi }, (cwd) => manager.getDefinitions(cwd)),
   });
 }

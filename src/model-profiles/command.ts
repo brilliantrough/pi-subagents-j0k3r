@@ -359,14 +359,14 @@ async function chooseSave(ctx: any, stagedProfiles: SubagentModelProfiles, input
   return message;
 }
 
-export async function runSubagentModelsCommand(ctx: any = {}): Promise<string> {
+export async function runSubagentModelsCommand(ctx: any = {}, getDefinitions: typeof loadSubagents = loadSubagents): Promise<string> {
   const agentDir = ctx?.agentDir;
   const hasCustomUi = typeof ctx?.ui?.custom === 'function';
   const hasSelectUi = typeof ctx?.ui?.select === 'function';
   if (!hasCustomUi && !hasSelectUi) return buildNonTuiModelProfilesMessage(agentDir);
 
   const cwd = ctx.cwd ?? process.cwd();
-  const definitions = loadSubagents(cwd);
+  const definitions = getDefinitions(cwd);
   const config = readSubagentsConfig(cwd);
   const availableModels = await getAvailableModels(ctx);
   const rows = buildModelProfileRows({ definitions, config, ctx, availableModels });

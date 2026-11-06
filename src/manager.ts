@@ -318,11 +318,16 @@ export class SubagentManager {
     private history = new SubagentHistoryStore(),
     private onTerminalBackgroundTask?: (task: SubagentTask, cwd: string) => void,
     private onInteractionPromptActive?: (active: boolean) => void,
+    private packageAgents: () => SubagentDefinition[] = () => [],
   ) {}
+
+  getDefinitions(cwd: string): SubagentDefinition[] {
+    return loadSubagents(cwd, this.packageAgents());
+  }
 
   listAgents(cwd: string, ctx: any = {}) {
     const config = readSubagentsConfig(cwd);
-    return loadSubagents(cwd).map((definition) => {
+    return this.getDefinitions(cwd).map((definition) => {
       const profile = resolveEffectiveSubagentProfile({ agentName: definition.name, definition, config, ctx });
       return {
         name: definition.name,
@@ -566,7 +571,7 @@ export class SubagentManager {
     const explicitMode = input.mode;
     const config = readSubagentsConfig(cwd);
 
-    const definitions = new Map(loadSubagents(cwd).map((definition) => [definition.name, definition]));
+    const definitions = new Map(this.getDefinitions(cwd).map((definition) => [definition.name, definition]));
     const limiter = this.limiter(cwd, config.max_concurrency);
     const displayName = resolveDisplayNameInput(input.display_name, input.name);
     let ids: string[] = [];
@@ -618,7 +623,7 @@ export class SubagentManager {
     }
 
     const config = readSubagentsConfig(taskCwd);
-    const definitions = new Map(loadSubagents(taskCwd).map((definition) => [definition.name, definition]));
+    const definitions = new Map(this.getDefinitions(taskCwd).map((definition) => [definition.name, definition]));
     const definition = definitions.get(latest.agent.toLowerCase());
     if (!definition) throw new Error(`Subagent definition not found for continuation: ${latest.agent}`);
     try { this.history.upsertTask(taskCwd, { ...latest, attempt: latest.attempt ?? 1 }); } catch {}

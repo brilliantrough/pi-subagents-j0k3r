@@ -1,5 +1,7 @@
 # Pi Subagents Extension
 
+本 fork 在上游 1.6.1 上增加包内 Agent 注册；协议与安装见 [PACKAGE-AGENTS.md](PACKAGE-AGENTS.md)。不要与 npm 版同时启用。
+
 Pi extension for delegating work to markdown-defined subagents. Continuation is unavailable by default: `subagent_continue` is exposed only when effective `enable_continue` is explicitly `true`. The extension registers tools for the orchestrator, runs subagents in isolated in-memory Pi sessions, tracks task history, provides a TUI history panel, and supports per-subagent model/thinking-effort profiles.
 
 ## What it provides
@@ -72,6 +74,7 @@ Subagents are markdown files with optional YAML-like frontmatter.
 
 Load order:
 
+0. Package agents registered through the extension event bus (global model profiles apply).
 1. Global user agents from `$PI_CODING_AGENT_DIR/agents/*.md`.
 2. Global user subagents from `$PI_CODING_AGENT_DIR/subagents/*.md`.
 3. Project agents from `.pi/agents/*.md`.

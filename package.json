@@ -1,6 +1,6 @@
 {
   "name": "pi-subagents-j0k3r",
-  "version": "1.0.0",
+  "version": "1.6.1-agent-skills.1",
   "description": "Installable Pi package that adds markdown-defined subagents, delegated task tools, history, and model profiles.",
   "type": "module",
   "license": "MIT",
@@ -29,6 +29,7 @@
     "scripts/verify-package-files.mjs",
     ".releaserc.json",
     "README.md",
+    "PACKAGE-AGENTS.md",
     "LICENSE",
     "CHANGELOG.md"
   ],
